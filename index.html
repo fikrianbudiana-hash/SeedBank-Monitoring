@@ -269,199 +269,402 @@
     }
 
 
-    /* =========================================================
-       GRID SENSOR
-    ========================================================== */
+/* =========================================================
+   SENSOR CARD
+========================================================= */
 
-    .sensor-grid{
+.sensor-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:20px;
+}
 
-      display:grid;
+.card{
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.95);
+  border-radius:24px;
+  box-shadow:0 12px 32px rgba(33,91,55,.08);
+  padding:22px;
+}
 
-      grid-template-columns:
-        repeat(2,minmax(280px,1fr));
 
-      gap:18px;
-    }
+/* =========================================================
+   SENSOR TITLE
+========================================================= */
 
+.title{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:750;
+  font-size:18px;
+}
 
-    .card{
+.icon{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:#e8f7eb;
+  font-size:20px;
+}
 
-      background:var(--card);
 
-      border:
-        1px solid rgba(255,255,255,.9);
+/* =========================================================
+   GAUGE
+========================================================= */
 
-      border-radius:25px;
+.gauge{
+  height:190px;
+  position:relative;
 
-      box-shadow:var(--shadow);
+  display:flex;
+  justify-content:center;
+  align-items:center;
 
-      padding:20px;
-    }
+  margin:4px 0 0;
 
+  overflow:hidden;
+}
 
-    .title{
+.gauge svg{
+  width:280px;
+  max-width:100%;
+  height:190px;
 
-      display:flex;
+  display:block;
 
-      align-items:center;
+  overflow:hidden;
+}
 
-      gap:11px;
 
-      font-weight:750;
+/* =========================================================
+   NILAI SENSOR
+========================================================= */
 
-      font-size:17px;
-    }
+.gauge .value{
+  position:absolute;
 
+  top:80px;
 
-    .icon{
+  left:0;
+  right:0;
 
-      width:38px;
-      height:38px;
+  text-align:center;
 
-      border-radius:13px;
+  font-size:34px;
+  line-height:1;
 
-      display:grid;
+  font-weight:850;
 
-      place-items:center;
+  letter-spacing:-1.5px;
 
-      background:#e8f7eb;
+  color:#123d27;
+}
 
-      font-size:19px;
-    }
 
+.gauge .unit{
+  position:absolute;
 
-    /* =========================================================
-       GAUGE
-    ========================================================== */
+  top:120px;
 
-    .gauge{
+  left:0;
+  right:0;
 
-      height:190px;
+  text-align:center;
 
-      position:relative;
+  font-size:14px;
 
-      display:grid;
+  color:#718279;
 
-      place-items:center;
+  font-weight:600;
+}
 
-      margin:4px 0;
-    }
 
+/* =========================================================
+   STATUS
+========================================================= */
 
-    .gauge svg{
+.status{
+  padding:12px 14px;
 
-      width:100%;
-      height:100%;
+  border-radius:15px;
 
-      overflow:visible;
-    }
+  background:#edf8ef;
 
+  margin-top:2px;
+}
 
-    .gauge .value{
+.status strong{
+  font-size:14px;
+}
 
-      position:absolute;
+.status p{
+  margin:5px 0 0;
 
-      top:94px;
+  color:#6d7e73;
 
-      font-size:31px;
+  font-size:12px;
+  line-height:1.4;
+}
 
-      font-weight:800;
 
-      letter-spacing:-1px;
-    }
+/* =========================================================
+   LEGEND
+========================================================= */
 
+.legend{
+  margin-top:13px;
 
-    .gauge .unit{
+  display:grid;
 
-      position:absolute;
+  gap:8px;
 
-      top:133px;
+  font-size:12px;
 
-      font-size:14px;
+  color:#66766d;
+}
 
-      color:var(--muted);
-    }
+.legend-row{
+  display:flex;
 
+  justify-content:space-between;
 
-    /* =========================================================
-       STATUS SENSOR
-    ========================================================== */
+  align-items:center;
 
-    .status{
+  gap:10px;
+}
 
-      padding:11px 12px;
+.key{
+  display:flex;
 
-      border-radius:15px;
+  gap:7px;
 
-      background:#ecf8ef;
+  align-items:center;
+}
 
-      margin-top:2px;
-    }
+.sw{
+  width:9px;
+  height:9px;
 
+  flex:0 0 auto;
 
-    .status strong{
+  border-radius:50%;
+}
 
-      font-size:14px;
-    }
 
+/* =========================================================
+   RELAY
+========================================================= */
 
-    .status p{
+.relay-grid{
+  display:grid;
 
-      margin:4px 0 0;
+  grid-template-columns:
+    repeat(2,minmax(0,1fr));
 
-      color:#6d7e73;
+  gap:20px;
 
-      font-size:12px;
-    }
+  margin-top:20px;
+}
 
+.relay-card{
+  background:rgba(255,255,255,.92);
 
-    /* =========================================================
-       LEGEND
-    ========================================================== */
+  border:
+    1px solid rgba(255,255,255,.95);
 
-    .legend{
+  border-radius:22px;
 
-      margin-top:10px;
+  box-shadow:
+    0 12px 32px rgba(33,91,55,.08);
 
-      display:grid;
+  padding:20px;
+}
 
-      gap:7px;
+.relay-header{
+  display:flex;
 
-      font-size:12px;
+  justify-content:space-between;
 
-      color:#66766d;
-    }
+  align-items:center;
 
+  margin-bottom:16px;
+}
 
-    .legend-row{
+.relay-name{
+  display:flex;
 
-      display:flex;
+  align-items:center;
 
-      justify-content:space-between;
+  gap:10px;
 
-      gap:10px;
-    }
+  font-size:17px;
 
+  font-weight:750;
+}
 
-    .key{
+.relay-icon{
+  width:40px;
+  height:40px;
 
-      display:flex;
+  display:grid;
 
-      gap:7px;
+  place-items:center;
 
-      align-items:center;
-    }
+  border-radius:13px;
 
+  background:#e8f7eb;
 
-    .sw{
+  font-size:20px;
+}
 
-      width:9px;
-      height:9px;
+.relay-status{
+  padding:7px 11px;
 
-      border-radius:50%;
-    }
+  border-radius:99px;
 
+  background:#eef2ef;
 
+  color:#718279;
+
+  font-size:12px;
+
+  font-weight:700;
+}
+
+.relay-status.on{
+  background:#dff6e5;
+
+  color:#23723d;
+}
+
+
+/* =========================================================
+   BUTTON RELAY
+========================================================= */
+
+.relay-buttons{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+}
+
+.relay-btn{
+  border:none;
+
+  padding:12px;
+
+  border-radius:13px;
+
+  cursor:pointer;
+
+  font-size:13px;
+
+  font-weight:750;
+
+  transition:
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.relay-btn:hover{
+  transform:translateY(-1px);
+}
+
+.relay-btn:active{
+  transform:translateY(0);
+}
+
+.btn-on{
+  background:#e2f7e7;
+
+  color:#23723d;
+}
+
+.btn-on.active{
+  background:#25a85a;
+
+  color:white;
+
+  box-shadow:
+    0 8px 18px
+    rgba(37,168,90,.22);
+}
+
+.btn-off{
+  background:#fbeaea;
+
+  color:#b84545;
+}
+
+.btn-off.active{
+  background:#f35b5b;
+
+  color:white;
+
+  box-shadow:
+    0 8px 18px
+    rgba(243,91,91,.20);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px){
+
+  .sensor-grid{
+    grid-template-columns:1fr;
+  }
+
+  .relay-grid{
+    grid-template-columns:1fr;
+  }
+
+  .gauge svg{
+    width:300px;
+  }
+}
+
+
+@media(max-width:620px){
+
+  main{
+    padding:16px;
+  }
+
+  .sensor-grid{
+    grid-template-columns:1fr;
+  }
+
+  .relay-grid{
+    grid-template-columns:1fr;
+  }
+
+  .gauge{
+    height:185px;
+  }
+
+  .gauge svg{
+    width:260px;
+    height:185px;
+  }
+
+  .gauge .value{
+    top:78px;
+    font-size:32px;
+  }
+
+  .gauge .unit{
+    top:117px;
+  }
+}
     /* =========================================================
        BAGIAN BAWAH
     ========================================================== */
@@ -1619,101 +1822,74 @@ function humidityStatus(value){
 ============================================================= */
 
 
-function gaugeSVG(type,value){
+function gaugeSVG(type, value){
 
   let min;
   let max;
-
   let status;
-
 
   if(type === "temperature"){
 
-    min =
-      CONFIG.TEMPERATURE.MIN;
+    min = CONFIG.TEMPERATURE.MIN;
+    max = CONFIG.TEMPERATURE.MAX;
 
-    max =
-      CONFIG.TEMPERATURE.MAX;
-
-    status =
-      temperatureStatus(value);
+    status = temperatureStatus(value);
 
   }
 
-
   if(type === "humidity"){
 
-    min =
-      CONFIG.HUMIDITY.MIN;
+    min = CONFIG.HUMIDITY.MIN;
+    max = CONFIG.HUMIDITY.MAX;
 
-    max =
-      CONFIG.HUMIDITY.MAX;
-
-    status =
-      humidityStatus(value);
+    status = humidityStatus(value);
 
   }
 
 
   const percentage =
-
     value === null
-
       ? 0
-
-      :
-
-    Math.max(
-      0,
-      Math.min(
-        1,
-        (value - min) /
-        (max - min)
-      )
-    );
+      : Math.max(
+          0,
+          Math.min(
+            1,
+            (value - min) /
+            (max - min)
+          )
+        );
 
 
   const angle =
-
     -135 +
     percentage * 270;
 
 
   const cx = 100;
-
   const cy = 100;
-
-  const r = 70;
-
-
-  const polar =
-    (a)=>[
-
-      cx +
-      r *
-      Math.cos(
-        a * Math.PI / 180
-      ),
-
-      cy +
-      r *
-      Math.sin(
-        a * Math.PI / 180
-      )
-
-    ];
+  const r = 68;
 
 
-  const p0 =
-    polar(-135);
+  const polar = (a) => [
+
+    cx +
+    r *
+    Math.cos(
+      a * Math.PI / 180
+    ),
+
+    cy +
+    r *
+    Math.sin(
+      a * Math.PI / 180
+    )
+
+  ];
 
 
-  const p1 =
-    polar(135);
-
-
-  const pe =
-    polar(angle);
+  const p0 = polar(-135);
+  const p1 = polar(135);
+  const pe = polar(angle);
 
 
   const large =
@@ -1723,92 +1899,84 @@ function gaugeSVG(type,value){
 
 
   const basePath = `
-
-    M ${p0[0]}
-      ${p0[1]}
-
-    A ${r}
-      ${r}
-      0
-      1
-      1
-      ${p1[0]}
-      ${p1[1]}
-
+    M ${p0[0]} ${p0[1]}
+    A ${r} ${r} 0 1 1
+    ${p1[0]} ${p1[1]}
   `;
 
 
   const activePath = `
-
-    M ${p0[0]}
-      ${p0[1]}
-
-    A ${r}
-      ${r}
-      0
-      ${large}
-      1
-      ${pe[0]}
-      ${pe[1]}
-
+    M ${p0[0]} ${p0[1]}
+    A ${r} ${r} 0 ${large} 1
+    ${pe[0]} ${pe[1]}
   `;
 
 
   const activeColor =
-
     value === null
-
       ? "#cbd7cf"
-
       : status[1];
 
 
   return `
 
-    <svg viewBox="0 0 200 190">
+    <svg
+      viewBox="0 0 200 190"
+      preserveAspectRatio="xMidYMid meet"
+    >
+
+      <!-- Background gauge -->
 
       <path
         d="${basePath}"
         fill="none"
-        stroke="#edf2ee"
-        stroke-width="15"
+        stroke="#eaf0ec"
+        stroke-width="13"
         stroke-linecap="round"
       ></path>
 
+
+      <!-- Gauge decoration -->
 
       <path
         d="${basePath}"
         fill="none"
-        stroke="#bfe8c8"
-        stroke-width="15"
+        stroke="#c6e9cf"
+        stroke-width="13"
         stroke-linecap="round"
-        stroke-dasharray="70 8 70 8 70 8 70 8"
+        stroke-dasharray="65 8 65 8 65 8"
       ></path>
 
+
+      <!-- Active gauge -->
 
       <path
         d="${activePath}"
         fill="none"
         stroke="${activeColor}"
-        stroke-width="15"
+        stroke-width="13"
         stroke-linecap="round"
       ></path>
 
 
+      <!-- Minimum -->
+
       <text
-        x="25"
-        y="174"
-        fill="#77867d"
+        x="28"
+        y="166"
+        fill="#829087"
         font-size="10"
       >
         ${min}
       </text>
 
 
+      <!-- Maximum -->
+
       <text
-        x="164"
-        y="174"
-        fill="#77867d"
+        x="155"
+        y="166"
+        fill="#829087"
         font-size="10"
       >
         ${max}
@@ -1817,7 +1985,6 @@ function gaugeSVG(type,value){
     </svg>
 
   `;
-
 }
 
 

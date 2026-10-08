@@ -1,223 +1,3066 @@
 <!doctype html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>GreenHouse Monitoring</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Seed Bank Monitoring System</title>
+
+  <!-- =========================================================
+       LIBRARY
+       Tidak perlu diubah
+  ========================================================== -->
   <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
   <style>
+
+    /* =========================================================
+       WARNA UTAMA
+       Pemula cukup mengubah warna di bagian ini
+    ========================================================== */
+
     :root{
-      --bg:#f3f8f3; --card:rgba(255,255,255,.86); --text:#173b2c;
-      --muted:#718279; --green:#25a85a; --green2:#70d98c;
-      --line:#e4eee6; --shadow:0 14px 40px rgba(33,91,55,.10);
-      --blue:#4a90e2; --yellow:#f4bb32; --red:#f35b5b;
+
+      --bg:#f3f8f3;
+      --card:rgba(255,255,255,.88);
+
+      --text:#173b2c;
+      --muted:#718279;
+
+      --green:#25a85a;
+      --green2:#70d98c;
+
+      --line:#e4eee6;
+
+      --blue:#4a90e2;
+      --yellow:#f4bb32;
+      --red:#f35b5b;
+
+      --shadow:0 14px 40px rgba(33,91,55,.10);
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;background:
-      radial-gradient(circle at 80% 0%,#dff4e4 0,transparent 32%),var(--bg);color:var(--text)}
-    .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-    aside{padding:28px 18px;border-right:1px solid #dfe9e1;background:rgba(244,250,245,.88);backdrop-filter:blur(18px)}
-    .brand{display:flex;gap:10px;align-items:center;margin:4px 8px 34px;font-weight:800;font-size:18px}
-    .leaf{width:38px;height:38px;border-radius:14px;background:#d9f5df;display:grid;place-items:center;font-size:21px}
-    nav a{display:block;padding:13px 15px;margin:6px 0;border-radius:15px;text-decoration:none;color:#567064}
-    nav a.active{background:#a7e5ae;color:#123d27;font-weight:700}
-    .connection{position:fixed;bottom:20px;left:18px;width:204px;padding:16px;border-radius:20px;background:rgba(255,255,255,.92);box-shadow:var(--shadow)}
-    .dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#aab7ae;margin-right:8px}
-    .dot.on{background:#2dbb5d;box-shadow:0 0 0 5px #dff6e5}
-    main{padding:34px;max-width:1600px;width:100%;margin:auto}
-    header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px}
-    h1{margin:0;font-size:32px;letter-spacing:-1px}
-    .subtitle{color:var(--muted);margin-top:6px}
-    .clock{background:rgba(255,255,255,.75);padding:12px 17px;border:1px solid var(--line);border-radius:18px;text-align:right}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(210px,1fr));gap:18px}
-    .card{background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:25px;box-shadow:var(--shadow);padding:20px}
-    .title{display:flex;align-items:center;gap:11px;font-weight:750;font-size:17px}
-    .icon{width:38px;height:38px;border-radius:13px;display:grid;place-items:center;background:#e8f7eb;font-size:19px}
-    .gauge{height:190px;position:relative;display:grid;place-items:center;margin:4px 0}
-    .gauge svg{width:100%;height:100%;overflow:visible}
-    .gauge .value{position:absolute;top:94px;font-size:31px;font-weight:800;letter-spacing:-1px}
-    .gauge .unit{position:absolute;top:133px;font-size:14px;color:var(--muted)}
-    .status{padding:11px 12px;border-radius:15px;background:#ecf8ef;margin-top:2px}
-    .status strong{font-size:14px}
-    .status p{margin:4px 0 0;color:#6d7e73;font-size:12px}
-    .legend{margin-top:10px;display:grid;gap:7px;font-size:12px;color:#66766d}
-    .legend-row{display:flex;justify-content:space-between;gap:10px}
-    .key{display:flex;gap:7px;align-items:center}.sw{width:9px;height:9px;border-radius:50%}
-    .bottom{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:18px}
-    .chartbox{height:360px}.chartbox canvas{width:100%!important;height:290px!important}
-    .latest{display:grid;gap:10px;margin-top:15px}
-    .reading{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--line);border-radius:16px}
-    .reading small{color:var(--muted)}
-    .reading b{font-size:18px}
-    .pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:99px;background:#e9f8ed;color:#23723d;font-size:12px;font-weight:700}
-    .note{font-size:12px;color:#839087;margin-top:14px;line-height:1.5}
-    @media(max-width:1050px){.app{grid-template-columns:1fr}aside{display:none}.grid{grid-template-columns:repeat(2,1fr)}main{padding:20px}.bottom{grid-template-columns:1fr}}
-    @media(max-width:620px){.grid{grid-template-columns:1fr}header{gap:15px;flex-direction:column}.clock{align-self:stretch;text-align:left}.gauge{height:205px}}
+
+
+    /* =========================================================
+       DASAR
+    ========================================================== */
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Segoe UI",
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at 80% 0%,
+          #dff4e4 0,
+          transparent 32%
+        ),
+        var(--bg);
+
+      color:var(--text);
+    }
+
+
+    /* =========================================================
+       LAYOUT UTAMA
+    ========================================================== */
+
+    .app{
+      display:grid;
+
+      grid-template-columns:240px 1fr;
+
+      min-height:100vh;
+    }
+
+
+    /* =========================================================
+       SIDEBAR
+    ========================================================== */
+
+    aside{
+      padding:28px 18px;
+
+      border-right:
+        1px solid #dfe9e1;
+
+      background:
+        rgba(244,250,245,.88);
+
+      backdrop-filter:blur(18px);
+    }
+
+
+    .brand{
+      display:flex;
+      align-items:center;
+
+      gap:10px;
+
+      margin:
+        4px 8px 34px;
+
+      font-weight:800;
+      font-size:18px;
+    }
+
+
+    .leaf{
+      width:38px;
+      height:38px;
+
+      border-radius:14px;
+
+      background:#d9f5df;
+
+      display:grid;
+      place-items:center;
+
+      font-size:21px;
+    }
+
+
+    nav a{
+      display:block;
+
+      padding:13px 15px;
+
+      margin:6px 0;
+
+      border-radius:15px;
+
+      text-decoration:none;
+
+      color:#567064;
+
+      cursor:pointer;
+    }
+
+
+    nav a.active{
+      background:#a7e5ae;
+
+      color:#123d27;
+
+      font-weight:700;
+    }
+
+
+    /* =========================================================
+       STATUS MQTT
+    ========================================================== */
+
+    .connection{
+
+      position:fixed;
+
+      bottom:20px;
+      left:18px;
+
+      width:204px;
+
+      padding:16px;
+
+      border-radius:20px;
+
+      background:
+        rgba(255,255,255,.92);
+
+      box-shadow:var(--shadow);
+    }
+
+
+    .dot{
+
+      display:inline-block;
+
+      width:10px;
+      height:10px;
+
+      border-radius:50%;
+
+      background:#aab7ae;
+
+      margin-right:8px;
+    }
+
+
+    .dot.on{
+
+      background:#2dbb5d;
+
+      box-shadow:
+        0 0 0 5px #dff6e5;
+    }
+
+
+    /* =========================================================
+       KONTEN
+    ========================================================== */
+
+    main{
+
+      padding:34px;
+
+      max-width:1600px;
+
+      width:100%;
+
+      margin:auto;
+    }
+
+
+    header{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:flex-start;
+
+      margin-bottom:26px;
+    }
+
+
+    h1{
+
+      margin:0;
+
+      font-size:32px;
+
+      letter-spacing:-1px;
+    }
+
+
+    .subtitle{
+
+      color:var(--muted);
+
+      margin-top:6px;
+    }
+
+
+    .clock{
+
+      background:
+        rgba(255,255,255,.75);
+
+      padding:
+        12px 17px;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:18px;
+
+      text-align:right;
+    }
+
+
+    /* =========================================================
+       GRID SENSOR
+    ========================================================== */
+
+    .sensor-grid{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(2,minmax(280px,1fr));
+
+      gap:18px;
+    }
+
+
+    .card{
+
+      background:var(--card);
+
+      border:
+        1px solid rgba(255,255,255,.9);
+
+      border-radius:25px;
+
+      box-shadow:var(--shadow);
+
+      padding:20px;
+    }
+
+
+    .title{
+
+      display:flex;
+
+      align-items:center;
+
+      gap:11px;
+
+      font-weight:750;
+
+      font-size:17px;
+    }
+
+
+    .icon{
+
+      width:38px;
+      height:38px;
+
+      border-radius:13px;
+
+      display:grid;
+
+      place-items:center;
+
+      background:#e8f7eb;
+
+      font-size:19px;
+    }
+
+
+    /* =========================================================
+       GAUGE
+    ========================================================== */
+
+    .gauge{
+
+      height:190px;
+
+      position:relative;
+
+      display:grid;
+
+      place-items:center;
+
+      margin:4px 0;
+    }
+
+
+    .gauge svg{
+
+      width:100%;
+      height:100%;
+
+      overflow:visible;
+    }
+
+
+    .gauge .value{
+
+      position:absolute;
+
+      top:94px;
+
+      font-size:31px;
+
+      font-weight:800;
+
+      letter-spacing:-1px;
+    }
+
+
+    .gauge .unit{
+
+      position:absolute;
+
+      top:133px;
+
+      font-size:14px;
+
+      color:var(--muted);
+    }
+
+
+    /* =========================================================
+       STATUS SENSOR
+    ========================================================== */
+
+    .status{
+
+      padding:11px 12px;
+
+      border-radius:15px;
+
+      background:#ecf8ef;
+
+      margin-top:2px;
+    }
+
+
+    .status strong{
+
+      font-size:14px;
+    }
+
+
+    .status p{
+
+      margin:4px 0 0;
+
+      color:#6d7e73;
+
+      font-size:12px;
+    }
+
+
+    /* =========================================================
+       LEGEND
+    ========================================================== */
+
+    .legend{
+
+      margin-top:10px;
+
+      display:grid;
+
+      gap:7px;
+
+      font-size:12px;
+
+      color:#66766d;
+    }
+
+
+    .legend-row{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      gap:10px;
+    }
+
+
+    .key{
+
+      display:flex;
+
+      gap:7px;
+
+      align-items:center;
+    }
+
+
+    .sw{
+
+      width:9px;
+      height:9px;
+
+      border-radius:50%;
+    }
+
+
+    /* =========================================================
+       BAGIAN BAWAH
+    ========================================================== */
+
+    .bottom{
+
+      display:grid;
+
+      grid-template-columns:
+        2fr 1fr;
+
+      gap:18px;
+
+      margin-top:18px;
+    }
+
+
+    .chartbox{
+
+      height:390px;
+    }
+
+
+    .chartbox canvas{
+
+      width:100%!important;
+
+      height:290px!important;
+    }
+
+
+    /* =========================================================
+       DATA TERBARU
+    ========================================================== */
+
+    .latest{
+
+      display:grid;
+
+      gap:10px;
+
+      margin-top:15px;
+    }
+
+
+    .reading{
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:space-between;
+
+      padding:13px 14px;
+
+      border:
+        1px solid var(--line);
+
+      border-radius:16px;
+    }
+
+
+    .reading small{
+
+      color:var(--muted);
+    }
+
+
+    .reading b{
+
+      font-size:18px;
+    }
+
+
+    /* =========================================================
+       BADGE LIVE
+    ========================================================== */
+
+    .pill{
+
+      display:inline-flex;
+
+      align-items:center;
+
+      gap:7px;
+
+      padding:7px 10px;
+
+      border-radius:99px;
+
+      background:#e9f8ed;
+
+      color:#23723d;
+
+      font-size:12px;
+
+      font-weight:700;
+    }
+
+
+    /* =========================================================
+       CATATAN
+    ========================================================== */
+
+    .note{
+
+      font-size:12px;
+
+      color:#839087;
+
+      margin-top:14px;
+
+      line-height:1.5;
+    }
+
+
+    /* =========================================================
+       KONTROL RELAY
+    ========================================================== */
+
+    .relay-grid{
+
+      display:grid;
+
+      grid-template-columns:
+        repeat(2,1fr);
+
+      gap:18px;
+
+      margin-top:18px;
+    }
+
+
+    .relay-card{
+
+      background:var(--card);
+
+      border:
+        1px solid rgba(255,255,255,.9);
+
+      border-radius:25px;
+
+      box-shadow:var(--shadow);
+
+      padding:20px;
+    }
+
+
+    .relay-header{
+
+      display:flex;
+
+      justify-content:space-between;
+
+      align-items:center;
+
+      margin-bottom:18px;
+    }
+
+
+    .relay-name{
+
+      display:flex;
+
+      align-items:center;
+
+      gap:10px;
+
+      font-size:17px;
+
+      font-weight:750;
+    }
+
+
+    .relay-icon{
+
+      width:40px;
+      height:40px;
+
+      display:grid;
+
+      place-items:center;
+
+      border-radius:13px;
+
+      background:#e8f7eb;
+
+      font-size:20px;
+    }
+
+
+    .relay-status{
+
+      padding:7px 11px;
+
+      border-radius:99px;
+
+      background:#eef2ef;
+
+      color:#718279;
+
+      font-size:12px;
+
+      font-weight:700;
+    }
+
+
+    .relay-status.on{
+
+      background:#dff6e5;
+
+      color:#23723d;
+    }
+
+
+    .relay-buttons{
+
+      display:grid;
+
+      grid-template-columns:
+        1fr 1fr;
+
+      gap:10px;
+    }
+
+
+    .relay-btn{
+
+      border:none;
+
+      padding:13px;
+
+      border-radius:14px;
+
+      cursor:pointer;
+
+      font-size:14px;
+
+      font-weight:700;
+
+      transition:.2s;
+    }
+
+
+    .relay-btn:hover{
+
+      transform:
+        translateY(-1px);
+    }
+
+
+    .relay-btn:active{
+
+      transform:
+        translateY(1px);
+    }
+
+
+    .btn-on{
+
+      background:#dff6e5;
+
+      color:#23723d;
+    }
+
+
+    .btn-on.active{
+
+      background:#25a85a;
+
+      color:white;
+
+      box-shadow:
+        0 7px 18px
+        rgba(37,168,90,.25);
+    }
+
+
+    .btn-off{
+
+      background:#fce9e9;
+
+      color:#bd4141;
+    }
+
+
+    .btn-off.active{
+
+      background:#f35b5b;
+
+      color:white;
+
+      box-shadow:
+        0 7px 18px
+        rgba(243,91,91,.22);
+    }
+
+
+    .relay-note{
+
+      margin-top:12px;
+
+      color:#839087;
+
+      font-size:12px;
+
+      line-height:1.5;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================== */
+
+    @media(max-width:1050px){
+
+      .app{
+
+        grid-template-columns:1fr;
+      }
+
+
+      aside{
+
+        display:none;
+      }
+
+
+      .sensor-grid{
+
+        grid-template-columns:
+          repeat(2,1fr);
+      }
+
+
+      main{
+
+        padding:20px;
+      }
+
+
+      .bottom{
+
+        grid-template-columns:1fr;
+      }
+    }
+
+
+    @media(max-width:700px){
+
+      .sensor-grid,
+      .relay-grid{
+
+        grid-template-columns:1fr;
+      }
+    }
+
+
+    @media(max-width:620px){
+
+      header{
+
+        gap:15px;
+
+        flex-direction:column;
+      }
+
+
+      .clock{
+
+        align-self:stretch;
+
+        text-align:left;
+      }
+
+
+      .gauge{
+
+        height:205px;
+      }
+    }
+
   </style>
+
 </head>
+
+
 <body>
+
+
 <div class="app">
+
+
+  <!-- =======================================================
+       SIDEBAR
+  ======================================================== -->
+
   <aside>
-    <div class="brand"><div class="leaf">🌿</div><div>GreenHouse<br><small style="font-weight:500;color:#718279">Monitoring System</small></div></div>
-    <nav>
-      <a class="active">⌂ &nbsp; Dashboard</a>
-      <a>⌁ &nbsp; Data Historis</a>
-      <a>☷ &nbsp; Kontrol Alat</a>
-      <a>⚙ &nbsp; Pengaturan</a>
-      <a>ⓘ &nbsp; Tentang</a>
-    </nav>
-    <div class="connection">
-      <div><span id="dot" class="dot"></span><b id="connText">Menghubungkan…</b></div>
-      <div style="font-size:12px;color:#77877e;margin-top:9px">MQTT: broker.emqx.io</div>
-      <div id="connTime" style="font-size:11px;color:#99a59e;margin-top:4px">—</div>
+
+    <div class="brand">
+
+      <div class="leaf">
+        🌾
+      </div>
+
+      <div>
+        Seed Bank<br>
+
+        <small
+          style="
+            font-weight:500;
+            color:#718279;
+          "
+        >
+          Monitoring System
+        </small>
+
+      </div>
+
     </div>
+
+
+    <nav>
+
+      <a class="active">
+        ⌂ &nbsp; Dashboard
+      </a>
+
+      <a>
+        ⌁ &nbsp; Data Historis
+      </a>
+
+      <a>
+        ⚡ &nbsp; Kontrol Relay
+      </a>
+
+      <a>
+        ⚙ &nbsp; Pengaturan
+      </a>
+
+      <a>
+        ⓘ &nbsp; Tentang
+      </a>
+
+    </nav>
+
+
+    <!-- STATUS MQTT -->
+
+    <div class="connection">
+
+      <div>
+
+        <span
+          id="dot"
+          class="dot"
+        ></span>
+
+        <b id="connText">
+          Menghubungkan…
+        </b>
+
+      </div>
+
+
+      <div
+        style="
+          font-size:12px;
+          color:#77877e;
+          margin-top:9px;
+        "
+      >
+
+        MQTT:
+
+        <span id="mqttDisplay">
+          seedbank/fikri/sensor
+        </span>
+
+      </div>
+
+
+      <div
+        id="connTime"
+        style="
+          font-size:11px;
+          color:#99a59e;
+          margin-top:4px;
+        "
+      >
+        —
+      </div>
+
+    </div>
+
   </aside>
 
+
+  <!-- =======================================================
+       KONTEN UTAMA
+  ======================================================== -->
+
   <main>
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
     <header>
+
       <div>
-        <h1>Selamat Datang 🌱</h1>
-        <div class="subtitle">Sistem Seed Bank · Real-time</div>
+
+        <h1>
+          Monitoring Seed Bank 🌱
+        </h1>
+
+        <div class="subtitle">
+          Pemantauan suhu dan kelembapan udara secara real-time
+        </div>
+
       </div>
-      <div class="clock"><b id="date">—</b><br><span id="time">—</span> WIB</div>
+
+
+      <div class="clock">
+
+        <b id="date">
+          —
+        </b>
+
+        <br>
+
+        <span id="time">
+          —
+        </span>
+
+        WIB
+
+      </div>
+
     </header>
 
-    <section class="grid">
-      <div class="card" id="tempCard"></div>
-      <div class="card" id="humCard"></div>
-      <div class="card" id="lightCard"></div>
-      <div class="card" id="ppmCard"></div>
+
+
+    <!-- =====================================================
+         SENSOR
+    ====================================================== -->
+
+    <section class="sensor-grid">
+
+      <div
+        class="card"
+        id="tempCard"
+      ></div>
+
+
+      <div
+        class="card"
+        id="humCard"
+      ></div>
+
     </section>
+
+
+
+    <!-- =====================================================
+         KONTROL RELAY
+    ====================================================== -->
+
+    <section class="relay-grid">
+
+
+      <!-- RELAY 1 -->
+
+      <div class="relay-card">
+
+        <div class="relay-header">
+
+          <div class="relay-name">
+
+            <div class="relay-icon">
+              💧
+            </div>
+
+            <div>
+
+              <div>
+                Relay 1
+              </div>
+
+              <div
+                style="
+                  font-size:12px;
+                  color:#87938c;
+                  font-weight:500;
+                  margin-top:3px;
+                "
+              >
+                Dehumidifier
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <span
+            id="relay1Status"
+            class="relay-status"
+          >
+            OFF
+          </span>
+
+        </div>
+
+
+        <div class="relay-buttons">
+
+          <button
+            class="relay-btn btn-on"
+            id="relay1On"
+            onclick="controlRelay(1,true)"
+          >
+            ⏻ NYALAKAN
+          </button>
+
+
+          <button
+            class="relay-btn btn-off"
+            id="relay1Off"
+            onclick="controlRelay(1,false)"
+          >
+            ◯ MATIKAN
+          </button>
+
+        </div>
+
+
+        <div class="relay-note">
+
+          Relay 1 digunakan untuk
+          mengendalikan dehumidifier
+          secara manual.
+
+        </div>
+
+      </div>
+
+
+
+      <!-- RELAY 2 -->
+
+      <div class="relay-card">
+
+        <div class="relay-header">
+
+          <div class="relay-name">
+
+            <div class="relay-icon">
+              ❄️
+            </div>
+
+            <div>
+
+              <div>
+                Relay 2
+              </div>
+
+              <div
+                style="
+                  font-size:12px;
+                  color:#87938c;
+                  font-weight:500;
+                  margin-top:3px;
+                "
+              >
+                Pendingin Ruangan
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <span
+            id="relay2Status"
+            class="relay-status"
+          >
+            OFF
+          </span>
+
+        </div>
+
+
+        <div class="relay-buttons">
+
+          <button
+            class="relay-btn btn-on"
+            id="relay2On"
+            onclick="controlRelay(2,true)"
+          >
+            ⏻ NYALAKAN
+          </button>
+
+
+          <button
+            class="relay-btn btn-off"
+            id="relay2Off"
+            onclick="controlRelay(2,false)"
+          >
+            ◯ MATIKAN
+          </button>
+
+        </div>
+
+
+        <div class="relay-note">
+
+          Relay 2 digunakan untuk
+          mengendalikan pendingin
+          ruangan secara manual.
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         GRAFIK + DATA TERBARU
+    ====================================================== -->
 
     <section class="bottom">
+
+
+      <!-- GRAFIK -->
+
       <div class="card chartbox">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div><b style="font-size:18px">Grafik Suhu & Kelembapan</b><div class="note">Data yang diterima dari ESP32</div></div>
-          <span class="pill">● Live</span>
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+          "
+        >
+
+          <div>
+
+            <b
+              style="font-size:18px"
+            >
+              Grafik Suhu & Kelembapan
+            </b>
+
+            <div class="note">
+              Data yang diterima dari ESP32
+            </div>
+
+          </div>
+
+
+          <span class="pill">
+            ● Live
+          </span>
+
         </div>
+
+
         <canvas id="chart"></canvas>
+
       </div>
+
+
+
+      <!-- DATA TERBARU -->
+
       <div class="card">
-        <b style="font-size:18px">Data Terbaru</b>
+
+        <b
+          style="font-size:18px"
+        >
+          Data Terbaru
+        </b>
+
+
         <div class="latest">
-          <div class="reading"><span>🌡️ Suhu</span><b id="latestTemp">—</b></div>
-          <div class="reading"><span>💧 Kelembapan</span><b id="latestHum">—</b></div>
-          <div class="reading"><span>☀️ Cahaya</span><b id="latestLight">—</b></div>
-          <div class="reading"><span>🌿 PPM Nutrisi</span><b id="latestPpm">—</b></div>
+
+
+          <div class="reading">
+
+            <span>
+              🌡️ Suhu Udara
+            </span>
+
+            <b id="latestTemp">
+              —
+            </b>
+
+          </div>
+
+
+          <div class="reading">
+
+            <span>
+              💧 Kelembapan Udara
+            </span>
+
+            <b id="latestHum">
+              —
+            </b>
+
+          </div>
+
+
+          <div class="reading">
+
+            <span>
+              💧 Dehumidifier
+            </span>
+
+            <b id="latestRelay1">
+              OFF
+            </b>
+
+          </div>
+
+
+          <div class="reading">
+
+            <span>
+              ❄️ Pendingin Ruangan
+            </span>
+
+            <b id="latestRelay2">
+              OFF
+            </b>
+
+          </div>
+
         </div>
-        <div class="note">Topic: <b>greenhouse/fikri/sensor</b><br>Untuk tahap awal, ESP32 mengirim suhu dan kelembapan. Cahaya dan PPM akan aktif setelah sensornya ditambahkan.</div>
+
+
+        <div class="note">
+
+          Topic sensor:
+          <b id="sensorTopicText">
+            seedbank/fikri/sensor
+          </b>
+
+          <br>
+
+          Topic kontrol:
+          <b id="commandTopicText">
+            seedbank/fikri/command
+          </b>
+
+        </div>
+
       </div>
+
     </section>
+
   </main>
+
 </div>
 
+
+
 <script>
-const MQTT_URL = "wss://broker.emqx.io:8084/mqtt";
-const TOPIC = "greenhouse/fikri/sensor";
-const clientId = "web-greenhouse-" + Math.random().toString(16).slice(2);
 
-const state = {temperature:null, humidity:null, light:null, ppm:null};
 
-const ranges = {
-  temperature: {min:0,max:50, unit:"°C", icon:"🌡️", title:"Suhu Udara",
-    levels:[["< 20 °C","Terlalu Rendah","#4a90e2"],["20 – 30 °C","Aman","#35b965"],["30 – 35 °C","Waspada","#f4bb32"],["> 35 °C","Berbahaya","#f35b5b"]]},
-  humidity: {min:0,max:100, unit:"%", icon:"💧", title:"Kelembapan Udara",
-    levels:[["< 40 %","Terlalu Rendah","#4a90e2"],["40 – 70 %","Aman","#35b965"],["70 – 85 %","Waspada","#f4bb32"],["> 85 %","Berbahaya","#f35b5b"]]},
-  light: {min:0,max:2000,unit:"lux",icon:"☀️",title:"Intensitas Cahaya",
-    levels:[["< 300 lux","Terlalu Rendah","#4a90e2"],["300 – 1000 lux","Aman","#35b965"],["1000 – 1500 lux","Waspada","#f4bb32"],["> 1500 lux","Berbahaya","#f35b5b"]]},
-  ppm: {min:0,max:2000,unit:"ppm",icon:"🌿",title:"PPM Nutrisi",
-    levels:[["< 400 ppm","Terlalu Rendah","#4a90e2"],["400 – 800 ppm","Aman","#35b965"],["800 – 1200 ppm","Waspada","#f4bb32"],["> 1200 ppm","Berbahaya","#f35b5b"]]}
+/* =============================================================
+   =============================================================
+   1. PENGATURAN UTAMA
+   =============================================================
+
+   BAGIAN PALING PENTING UNTUK PEMULA
+
+   Biasanya hanya bagian ini yang perlu diedit.
+
+   ============================================================= */
+
+
+const CONFIG = {
+
+
+  /* -----------------------------------------------------------
+     NAMA SISTEM
+  ------------------------------------------------------------ */
+
+  SYSTEM_NAME:
+    "Seed Bank Monitoring System",
+
+
+  /* -----------------------------------------------------------
+     MQTT
+     
+     Kalau topic ESP32 berbeda,
+     cukup ubah dua baris ini.
+  ------------------------------------------------------------ */
+
+  MQTT_URL:
+    "wss://broker.emqx.io:8084/mqtt",
+
+
+  SENSOR_TOPIC:
+    "seedbank/fikri/sensor",
+
+
+  COMMAND_TOPIC:
+    "seedbank/fikri/command",
+
+
+  /* -----------------------------------------------------------
+     NAMA DEVICE
+  ------------------------------------------------------------ */
+
+  DEVICE_NAME:
+    "ESP32 Seed Bank",
+
+
+  /* -----------------------------------------------------------
+     BATAS SUHU
+     
+     INI HANYA CONTOH.
+     Sesuaikan dengan kebutuhan penyimpanan benih.
+  ------------------------------------------------------------ */
+
+  TEMPERATURE:{
+
+    MIN:0,
+
+    MAX:50,
+
+    SAFE_MIN:20,
+
+    SAFE_MAX:30
+  },
+
+
+  /* -----------------------------------------------------------
+     BATAS KELEMBAPAN
+     
+     INI HANYA CONTOH.
+     Sesuaikan dengan kebutuhan penyimpanan benih.
+  ------------------------------------------------------------ */
+
+  HUMIDITY:{
+
+    MIN:0,
+
+    MAX:100,
+
+    SAFE_MIN:40,
+
+    SAFE_MAX:70
+  },
+
+
+  /* -----------------------------------------------------------
+     NAMA RELAY
+     
+     Bisa diganti tanpa menyentuh bagian lain.
+  ------------------------------------------------------------ */
+
+  RELAY1_NAME:
+    "Dehumidifier",
+
+
+  RELAY2_NAME:
+    "Pendingin Ruangan"
+
 };
 
-function statusFor(type,v){
-  if(v===null || Number.isNaN(v)) return ["Menunggu data","#8a9790","Belum ada data sensor."];
-  const L=ranges[type].levels;
-  if(type==="temperature") return v<20?[L[0][1],L[0][2],"Suhu berada di bawah rentang aman."]:v<=30?[L[1][1],L[1][2],"Suhu berada dalam rentang aman."]:v<=35?[L[2][1],L[2][2],"Perlu dipantau karena mulai meningkat."]:[L[3][1],L[3][2],"Suhu berada pada kondisi berbahaya."];
-  if(type==="humidity") return v<40?[L[0][1],L[0][2],"Kelembapan terlalu rendah."]:v<=70?[L[1][1],L[1][2],"Kelembapan berada dalam rentang aman."]:v<=85?[L[2][1],L[2][2],"Kelembapan mulai tinggi dan perlu dipantau."]:[L[3][1],L[3][2],"Kelembapan berada pada kondisi berbahaya."];
-  if(type==="light") return v<300?[L[0][1],L[0][2],"Intensitas cahaya relatif rendah."]:v<=1000?[L[1][1],L[1][2],"Intensitas cahaya berada dalam rentang yang ditetapkan."]:v<=1500?[L[2][1],L[2][2],"Intensitas cahaya cukup tinggi."]:[L[3][1],L[3][2],"Intensitas cahaya sangat tinggi."];
-  return v<400?[L[0][1],L[0][2],"Kadar nutrisi relatif rendah."]:v<=800?[L[1][1],L[1][2],"Kadar nutrisi berada dalam rentang yang ditetapkan."]:v<=1200?[L[2][1],L[2][2],"Kadar nutrisi mulai tinggi."]:[L[3][1],L[3][2],"Kadar nutrisi sangat tinggi."];
+
+/* =============================================================
+   2. DATA SEMENTARA
+   Jangan diubah
+============================================================= */
+
+
+const state = {
+
+  temperature:null,
+
+  humidity:null,
+
+  relay1:false,
+
+  relay2:false
+
+};
+
+
+
+/* =============================================================
+   3. FUNGSI STATUS SUHU
+============================================================= */
+
+
+function temperatureStatus(value){
+
+  if(
+    value === null ||
+    Number.isNaN(value)
+  ){
+
+    return [
+      "Menunggu data",
+      "#8a9790",
+      "Belum ada data suhu."
+    ];
+
+  }
+
+
+  if(
+    value <
+    CONFIG.TEMPERATURE.SAFE_MIN
+  ){
+
+    return [
+      "Terlalu Rendah",
+      "#4a90e2",
+      "Suhu berada di bawah rentang yang ditentukan."
+    ];
+
+  }
+
+
+  if(
+    value <=
+    CONFIG.TEMPERATURE.SAFE_MAX
+  ){
+
+    return [
+      "Aman",
+      "#35b965",
+      "Suhu berada dalam rentang yang ditentukan."
+    ];
+
+  }
+
+
+  if(
+    value <=
+    CONFIG.TEMPERATURE.SAFE_MAX + 5
+  ){
+
+    return [
+      "Waspada",
+      "#f4bb32",
+      "Suhu mulai meningkat dan perlu dipantau."
+    ];
+
+  }
+
+
+  return [
+
+    "Berbahaya",
+
+    "#f35b5b",
+
+    "Suhu berada di atas rentang yang ditentukan."
+
+  ];
+
 }
 
-function gaugeSVG(type,v){
-  const cfg=ranges[type], pct=v==null?0:Math.max(0,Math.min(1,(v-cfg.min)/(cfg.max-cfg.min)));
-  const angle = -135 + pct*270;
-  const cx=100,cy=100,r=70;
-  const polar=(a)=>[cx+r*Math.cos(a*Math.PI/180),cy+r*Math.sin(a*Math.PI/180)];
-  const p0=polar(-135),p1=polar(135);
-  const pe=polar(angle), large=angle+135>180?1:0;
-  const path=`M ${p0[0]} ${p0[1]} A ${r} ${r} 0 1 1 ${p1[0]} ${p1[1]}`;
-  const active=v==null?"#cbd7cf":statusFor(type,v)[1];
-  const activePath=`M ${p0[0]} ${p0[1]} A ${r} ${r} 0 ${large} 1 ${pe[0]} ${pe[1]}`;
-  return `<svg viewBox="0 0 200 190">
-    <path d="${path}" fill="none" stroke="#edf2ee" stroke-width="15" stroke-linecap="round"/>
-    <path d="${path}" fill="none" stroke="#bfe8c8" stroke-width="15" stroke-linecap="round" stroke-dasharray="70 8 70 8 70 8 70 8"/>
-    <path d="${activePath}" fill="none" stroke="${active}" stroke-width="15" stroke-linecap="round"/>
-    <text x="25" y="174" fill="#77867d" font-size="10">${cfg.min}</text>
-    <text x="164" y="174" fill="#77867d" font-size="10">${cfg.max}</text>
-  </svg>`;
+
+
+/* =============================================================
+   4. FUNGSI STATUS KELEMBAPAN
+============================================================= */
+
+
+function humidityStatus(value){
+
+  if(
+    value === null ||
+    Number.isNaN(value)
+  ){
+
+    return [
+      "Menunggu data",
+      "#8a9790",
+      "Belum ada data kelembapan."
+    ];
+
+  }
+
+
+  if(
+    value <
+    CONFIG.HUMIDITY.SAFE_MIN
+  ){
+
+    return [
+      "Terlalu Rendah",
+      "#4a90e2",
+      "Kelembapan berada di bawah rentang yang ditentukan."
+    ];
+
+  }
+
+
+  if(
+    value <=
+    CONFIG.HUMIDITY.SAFE_MAX
+  ){
+
+    return [
+      "Aman",
+      "#35b965",
+      "Kelembapan berada dalam rentang yang ditentukan."
+    ];
+
+  }
+
+
+  if(
+    value <=
+    CONFIG.HUMIDITY.SAFE_MAX + 15
+  ){
+
+    return [
+      "Waspada",
+      "#f4bb32",
+      "Kelembapan mulai meningkat dan perlu dipantau."
+    ];
+
+  }
+
+
+  return [
+
+    "Berbahaya",
+
+    "#f35b5b",
+
+    "Kelembapan berada di atas rentang yang ditentukan."
+
+  ];
+
 }
 
-function renderCard(type,id){
-  const cfg=ranges[type], v=state[type], st=statusFor(type,v);
-  const value=v==null?"—":Number(v).toFixed(type==="temperature"?1:0);
-  document.getElementById(id).innerHTML=`
-    <div class="title"><div class="icon">${cfg.icon}</div><div>${cfg.title}<div style="font-size:12px;color:#87938c;font-weight:500">Dalam greenhouse</div></div></div>
-    <div class="gauge">${gaugeSVG(type,v)}<div class="value">${value}</div><div class="unit">${v==null?"":cfg.unit}</div></div>
-    <div class="status"><strong style="color:${st[1]}"><span class="dot" style="background:${st[1]};margin-right:7px"></span>${st[0]}</strong><p>${st[2]}</p></div>
-    <div class="legend">${cfg.levels.map(x=>`<div class="legend-row"><span class="key"><i class="sw" style="background:${x[2]}"></i>${x[0]}</span><span>${x[1]}</span></div>`).join("")}</div>`;
+
+
+/* =============================================================
+   5. MEMBUAT GAUGE
+============================================================= */
+
+
+function gaugeSVG(type,value){
+
+  let min;
+  let max;
+
+  let status;
+
+
+  if(type === "temperature"){
+
+    min =
+      CONFIG.TEMPERATURE.MIN;
+
+    max =
+      CONFIG.TEMPERATURE.MAX;
+
+    status =
+      temperatureStatus(value);
+
+  }
+
+
+  if(type === "humidity"){
+
+    min =
+      CONFIG.HUMIDITY.MIN;
+
+    max =
+      CONFIG.HUMIDITY.MAX;
+
+    status =
+      humidityStatus(value);
+
+  }
+
+
+  const percentage =
+
+    value === null
+
+      ? 0
+
+      :
+
+    Math.max(
+      0,
+      Math.min(
+        1,
+        (value - min) /
+        (max - min)
+      )
+    );
+
+
+  const angle =
+
+    -135 +
+    percentage * 270;
+
+
+  const cx = 100;
+
+  const cy = 100;
+
+  const r = 70;
+
+
+  const polar =
+    (a)=>[
+
+      cx +
+      r *
+      Math.cos(
+        a * Math.PI / 180
+      ),
+
+      cy +
+      r *
+      Math.sin(
+        a * Math.PI / 180
+      )
+
+    ];
+
+
+  const p0 =
+    polar(-135);
+
+
+  const p1 =
+    polar(135);
+
+
+  const pe =
+    polar(angle);
+
+
+  const large =
+    angle + 135 > 180
+      ? 1
+      : 0;
+
+
+  const basePath = `
+
+    M ${p0[0]}
+      ${p0[1]}
+
+    A ${r}
+      ${r}
+      0
+      1
+      1
+      ${p1[0]}
+      ${p1[1]}
+
+  `;
+
+
+  const activePath = `
+
+    M ${p0[0]}
+      ${p0[1]}
+
+    A ${r}
+      ${r}
+      0
+      ${large}
+      1
+      ${pe[0]}
+      ${pe[1]}
+
+  `;
+
+
+  const activeColor =
+
+    value === null
+
+      ? "#cbd7cf"
+
+      : status[1];
+
+
+  return `
+
+    <svg viewBox="0 0 200 190">
+
+      <path
+        d="${basePath}"
+        fill="none"
+        stroke="#edf2ee"
+        stroke-width="15"
+        stroke-linecap="round"
+      ></path>
+
+
+      <path
+        d="${basePath}"
+        fill="none"
+        stroke="#bfe8c8"
+        stroke-width="15"
+        stroke-linecap="round"
+        stroke-dasharray="70 8 70 8 70 8 70 8"
+      ></path>
+
+
+      <path
+        d="${activePath}"
+        fill="none"
+        stroke="${activeColor}"
+        stroke-width="15"
+        stroke-linecap="round"
+      ></path>
+
+
+      <text
+        x="25"
+        y="174"
+        fill="#77867d"
+        font-size="10"
+      >
+        ${min}
+      </text>
+
+
+      <text
+        x="164"
+        y="174"
+        fill="#77867d"
+        font-size="10"
+      >
+        ${max}
+      </text>
+
+    </svg>
+
+  `;
+
 }
-["temperature","humidity","light","ppm"].forEach((t,i)=>renderCard(t,["tempCard","humCard","lightCard","ppmCard"][i]));
+
+
+
+/* =============================================================
+   6. MEMBUAT KARTU SENSOR
+============================================================= */
+
+
+function renderSensorCard(
+  type,
+  elementId
+){
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  let value;
+
+  let title;
+
+  let icon;
+
+  let unit;
+
+  let status;
+
+
+  if(type === "temperature"){
+
+    value =
+      state.temperature;
+
+    title =
+      "Suhu Udara";
+
+    icon =
+      "🌡️";
+
+    unit =
+      "°C";
+
+    status =
+      temperatureStatus(value);
+
+  }
+
+
+  if(type === "humidity"){
+
+    value =
+      state.humidity;
+
+    title =
+      "Kelembapan Udara";
+
+    icon =
+      "💧";
+
+    unit =
+      "%";
+
+    status =
+      humidityStatus(value);
+
+  }
+
+
+  const displayValue =
+
+    value === null
+
+      ? "—"
+
+      :
+
+    type === "temperature"
+
+      ? Number(value).toFixed(1)
+
+      : Number(value).toFixed(1);
+
+
+  element.innerHTML = `
+
+
+    <div class="title">
+
+      <div class="icon">
+        ${icon}
+      </div>
+
+      <div>
+
+        ${title}
+
+        <div
+          style="
+            font-size:12px;
+            color:#87938c;
+            font-weight:500;
+          "
+        >
+          Monitoring Seed Bank
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="gauge">
+
+      ${gaugeSVG(
+        type,
+        value
+      )}
+
+      <div class="value">
+        ${displayValue}
+      </div>
+
+
+      <div class="unit">
+
+        ${
+          value === null
+            ? ""
+            : unit
+        }
+
+      </div>
+
+    </div>
+
+
+    <div class="status">
+
+      <strong
+        style="
+          color:${status[1]};
+        "
+      >
+
+        <span
+          class="dot"
+          style="
+            background:${status[1]};
+            margin-right:7px;
+          "
+        ></span>
+
+        ${status[0]}
+
+      </strong>
+
+
+      <p>
+        ${status[2]}
+      </p>
+
+    </div>
+
+
+    <div class="legend">
+
+
+      <div class="legend-row">
+
+        <span class="key">
+
+          <i
+            class="sw"
+            style="background:#4a90e2"
+          ></i>
+
+          Rendah
+
+        </span>
+
+        <span>
+          Di bawah batas
+        </span>
+
+      </div>
+
+
+      <div class="legend-row">
+
+        <span class="key">
+
+          <i
+            class="sw"
+            style="background:#35b965"
+          ></i>
+
+          Aman
+
+        </span>
+
+        <span>
+          Rentang aman
+        </span>
+
+      </div>
+
+
+      <div class="legend-row">
+
+        <span class="key">
+
+          <i
+            class="sw"
+            style="background:#f4bb32"
+          ></i>
+
+          Waspada
+
+        </span>
+
+        <span>
+          Perlu dipantau
+        </span>
+
+      </div>
+
+
+      <div class="legend-row">
+
+        <span class="key">
+
+          <i
+            class="sw"
+            style="background:#f35b5b"
+          ></i>
+
+          Berbahaya
+
+        </span>
+
+        <span>
+          Di atas batas
+        </span>
+
+      </div>
+
+
+    </div>
+
+  `;
+
+}
+
+
+
+/* =============================================================
+   7. REFRESH TAMPILAN
+============================================================= */
+
 
 function refresh(){
-  renderCard("temperature","tempCard"); renderCard("humidity","humCard");
-  renderCard("light","lightCard"); renderCard("ppm","ppmCard");
-  document.getElementById("latestTemp").textContent=state.temperature==null?"—":state.temperature.toFixed(1)+" °C";
-  document.getElementById("latestHum").textContent=state.humidity==null?"—":state.humidity.toFixed(1)+" %";
-  document.getElementById("latestLight").textContent=state.light==null?"—":state.light.toFixed(0)+" lux";
-  document.getElementById("latestPpm").textContent=state.ppm==null?"—":state.ppm.toFixed(0)+" ppm";
+
+  renderSensorCard(
+    "temperature",
+    "tempCard"
+  );
+
+
+  renderSensorCard(
+    "humidity",
+    "humCard"
+  );
+
+
+  document.getElementById(
+    "latestTemp"
+  ).textContent =
+
+    state.temperature === null
+
+      ? "—"
+
+      :
+
+    state.temperature.toFixed(1)
+    + " °C";
+
+
+  document.getElementById(
+    "latestHum"
+  ).textContent =
+
+    state.humidity === null
+
+      ? "—"
+
+      :
+
+    state.humidity.toFixed(1)
+    + " %";
+
+
+  updateRelayUI(
+    1,
+    state.relay1
+  );
+
+
+  updateRelayUI(
+    2,
+    state.relay2
+  );
+
 }
 
-const labels=[], tempData=[], humData=[];
-const chart = new Chart(document.getElementById("chart"),{
-  type:"line",
-  data:{labels,datasets:[
-    {label:"Suhu (°C)",data:tempData,borderColor:"#2aa85a",backgroundColor:"rgba(42,168,90,.10)",fill:true,tension:.35,pointRadius:0},
-    {label:"Kelembapan (%)",data:humData,borderColor:"#4a90e2",backgroundColor:"rgba(74,144,226,.08)",fill:true,tension:.35,pointRadius:0}
-  ]},
-  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"bottom"}},scales:{y:{beginAtZero:true,max:100,grid:{color:"#edf2ee"}},x:{grid:{display:false}}}}
-});
+
+
+/* =============================================================
+   8. GRAFIK
+============================================================= */
+
+
+const labels = [];
+
+const tempData = [];
+
+const humData = [];
+
+
+const chart =
+
+  new Chart(
+
+    document.getElementById(
+      "chart"
+    ),
+
+    {
+
+      type:"line",
+
+
+      data:{
+
+        labels,
+
+
+        datasets:[
+
+          {
+
+            label:"Suhu (°C)",
+
+            data:tempData,
+
+            borderColor:"#2aa85a",
+
+            backgroundColor:
+              "rgba(42,168,90,.10)",
+
+            fill:true,
+
+            tension:.35,
+
+            pointRadius:0,
+
+            yAxisID:"tempAxis"
+
+          },
+
+
+          {
+
+            label:"Kelembapan (%)",
+
+            data:humData,
+
+            borderColor:"#4a90e2",
+
+            backgroundColor:
+              "rgba(74,144,226,.08)",
+
+            fill:true,
+
+            tension:.35,
+
+            pointRadius:0,
+
+            yAxisID:"humAxis"
+
+          }
+
+        ]
+
+      },
+
+
+      options:{
+
+        responsive:true,
+
+        maintainAspectRatio:false,
+
+
+        plugins:{
+
+          legend:{
+
+            position:"bottom"
+
+          }
+
+        },
+
+
+        scales:{
+
+          tempAxis:{
+
+            type:"linear",
+
+            position:"left",
+
+            title:{
+
+              display:true,
+
+              text:"Suhu (°C)"
+
+            },
+
+            grid:{
+
+              color:"#edf2ee"
+
+            }
+
+          },
+
+
+          humAxis:{
+
+            type:"linear",
+
+            position:"right",
+
+            min:0,
+
+            max:100,
+
+            title:{
+
+              display:true,
+
+              text:"Kelembapan (%)"
+
+            },
+
+            grid:{
+
+              drawOnChartArea:false
+
+            }
+
+          },
+
+
+          x:{
+
+            grid:{
+
+              display:false
+
+            }
+
+          }
+
+        }
+
+      }
+
+    }
+
+  );
+
+
+
+/* =============================================================
+   9. TAMBAH DATA KE GRAFIK
+============================================================= */
+
 
 function addHistory(){
-  const now=new Date(); labels.push(now.toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"}));
-  tempData.push(state.temperature); humData.push(state.humidity);
-  if(labels.length>30){labels.shift();tempData.shift();humData.shift();}
+
+  const now =
+    new Date();
+
+
+  const time =
+    now.toLocaleTimeString(
+      "id-ID",
+      {
+        hour:"2-digit",
+        minute:"2-digit",
+        second:"2-digit"
+      }
+    );
+
+
+  labels.push(time);
+
+
+  tempData.push(
+    state.temperature
+  );
+
+
+  humData.push(
+    state.humidity
+  );
+
+
+  /*
+     Grafik hanya menyimpan
+     30 data terakhir.
+  */
+
+  if(labels.length > 30){
+
+    labels.shift();
+
+    tempData.shift();
+
+    humData.shift();
+
+  }
+
+
   chart.update();
+
 }
+
+
+
+/* =============================================================
+   10. JAM DIGITAL
+============================================================= */
+
 
 function setClock(){
-  const d=new Date();
-  document.getElementById("date").textContent=d.toLocaleDateString("id-ID",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
-  document.getElementById("time").textContent=d.toLocaleTimeString("id-ID");
-}
-setInterval(setClock,1000);setClock();
 
-const dot=document.getElementById("dot"), connText=document.getElementById("connText"), connTime=document.getElementById("connTime");
-const client=mqtt.connect(MQTT_URL,{clientId,clean:true,connectTimeout:10000,reconnectPeriod:3000});
-client.on("connect",()=>{dot.classList.add("on");connText.textContent="ESP32 / MQTT Online";connTime.textContent="Terhubung "+new Date().toLocaleTimeString("id-ID");client.subscribe(TOPIC);});
-client.on("reconnect",()=>{connText.textContent="Menghubungkan ulang…";dot.classList.remove("on")});
-client.on("offline",()=>{connText.textContent="MQTT Offline";dot.classList.remove("on")});
-client.on("error",(e)=>{console.error("MQTT:",e)});
-client.on("message",(topic,message)=>{
-  try{
-    const data=JSON.parse(message.toString());
-    if(typeof data.temperature==="number") state.temperature=data.temperature;
-    if(typeof data.humidity==="number") state.humidity=data.humidity;
-    if(typeof data.light==="number") state.light=data.light;
-    if(typeof data.ppm==="number") state.ppm=data.ppm;
-    refresh(); addHistory();
-  }catch(e){console.error("Payload bukan JSON valid:",e)}
-});
+  const now =
+    new Date();
+
+
+  document.getElementById(
+    "date"
+  ).textContent =
+
+    now.toLocaleDateString(
+      "id-ID",
+      {
+        weekday:"long",
+        day:"2-digit",
+        month:"long",
+        year:"numeric"
+      }
+    );
+
+
+  document.getElementById(
+    "time"
+  ).textContent =
+
+    now.toLocaleTimeString(
+      "id-ID"
+    );
+
+}
+
+
+setInterval(
+  setClock,
+  1000
+);
+
+
+setClock();
+
+
+
+/* =============================================================
+   11. KONTROL RELAY
+============================================================= */
+
+
+/*
+   Fungsi ini digunakan saat tombol
+   NYALAKAN / MATIKAN ditekan.
+
+   relayNumber:
+   1 = Dehumidifier
+   2 = Pendingin Ruangan
+
+   turnOn:
+   true  = ON
+   false = OFF
+*/
+
+
+function controlRelay(
+  relayNumber,
+  turnOn
+){
+
+
+  /*
+     Periksa koneksi terlebih dahulu.
+  */
+
+  if(
+    !client ||
+    !client.connected
+  ){
+
+    alert(
+      "MQTT belum terhubung."
+    );
+
+    return;
+
+  }
+
+
+  /*
+     Tentukan nama relay.
+  */
+
+  const relayName =
+
+    relayNumber === 1
+
+      ? CONFIG.RELAY1_NAME
+
+      : CONFIG.RELAY2_NAME;
+
+
+  /*
+     Buat perintah MQTT.
+  */
+
+  const command = {};
+
+
+  if(relayNumber === 1){
+
+    command.relay1 =
+      turnOn
+        ? "ON"
+        : "OFF";
+
+  }
+
+
+  if(relayNumber === 2){
+
+    command.relay2 =
+      turnOn
+        ? "ON"
+        : "OFF";
+
+  }
+
+
+  /*
+     Ubah object menjadi JSON.
+  */
+
+  const message =
+    JSON.stringify(
+      command
+    );
+
+
+  /*
+     Kirim perintah ke ESP32.
+  */
+
+  client.publish(
+
+    CONFIG.COMMAND_TOPIC,
+
+    message,
+
+    {
+      qos:0,
+      retain:false
+    }
+
+  );
+
+
+  /*
+     Update tampilan sementara.
+
+     ESP32 tetap sebaiknya mengirim
+     status relay kembali agar status
+     benar-benar mengikuti perangkat.
+  */
+
+  if(relayNumber === 1){
+
+    state.relay1 =
+      turnOn;
+
+  }
+
+
+  if(relayNumber === 2){
+
+    state.relay2 =
+      turnOn;
+
+  }
+
+
+  updateRelayUI(
+    relayNumber,
+    turnOn
+  );
+
+
+  console.log(
+    "Perintah relay:",
+    relayName,
+    message
+  );
+
+}
+
+
+
+/* =============================================================
+   12. UPDATE TAMPILAN RELAY
+============================================================= */
+
+
+function updateRelayUI(
+  relayNumber,
+  isOn
+){
+
+
+  const statusElement =
+
+    document.getElementById(
+      `relay${relayNumber}Status`
+    );
+
+
+  const onButton =
+
+    document.getElementById(
+      `relay${relayNumber}On`
+    );
+
+
+  const offButton =
+
+    document.getElementById(
+      `relay${relayNumber}Off`
+    );
+
+
+  const latestElement =
+
+    document.getElementById(
+      `latestRelay${relayNumber}`
+    );
+
+
+  /*
+     Status badge
+  */
+
+  statusElement.textContent =
+    isOn
+      ? "ON"
+      : "OFF";
+
+
+  statusElement.classList.toggle(
+    "on",
+    isOn
+  );
+
+
+  /*
+     Tombol ON
+  */
+
+  onButton.classList.toggle(
+    "active",
+    isOn
+  );
+
+
+  /*
+     Tombol OFF
+  */
+
+  offButton.classList.toggle(
+    "active",
+    !isOn
+  );
+
+
+  /*
+     Data terbaru
+  */
+
+  latestElement.textContent =
+    isOn
+      ? "ON"
+      : "OFF";
+
+}
+
+
+
+/* =============================================================
+   13. MQTT
+============================================================= */
+
+
+/*
+   ID unik untuk browser.
+
+   Tidak perlu diubah.
+*/
+
+const clientId =
+
+  "seedbank-web-" +
+
+  Math.random()
+    .toString(16)
+    .slice(2);
+
+
+
+/*
+   Membuat koneksi MQTT.
+*/
+
+const client =
+
+  mqtt.connect(
+
+    CONFIG.MQTT_URL,
+
+    {
+
+      clientId,
+
+      clean:true,
+
+      connectTimeout:10000,
+
+      reconnectPeriod:3000
+
+    }
+
+  );
+
+
+
+/* =============================================================
+   14. ELEMENT STATUS KONEKSI
+============================================================= */
+
+
+const dot =
+  document.getElementById(
+    "dot"
+  );
+
+
+const connText =
+  document.getElementById(
+    "connText"
+  );
+
+
+const connTime =
+  document.getElementById(
+    "connTime"
+  );
+
+
+
+/* =============================================================
+   15. MQTT CONNECTED
+============================================================= */
+
+
+client.on(
+  "connect",
+  ()=>{
+
+    dot.classList.add(
+      "on"
+    );
+
+
+    connText.textContent =
+      CONFIG.DEVICE_NAME
+      + " / MQTT Online";
+
+
+    connTime.textContent =
+
+      "Terhubung " +
+
+      new Date()
+        .toLocaleTimeString(
+          "id-ID"
+        );
+
+
+    /*
+       Subscribe topic sensor.
+    */
+
+    client.subscribe(
+      CONFIG.SENSOR_TOPIC
+    );
+
+
+    console.log(
+      "Terhubung MQTT"
+    );
+
+
+    console.log(
+      "Sensor topic:",
+      CONFIG.SENSOR_TOPIC
+    );
+
+
+    console.log(
+      "Command topic:",
+      CONFIG.COMMAND_TOPIC
+    );
+
+  }
+);
+
+
+
+/* =============================================================
+   16. MQTT RECONNECT
+============================================================= */
+
+
+client.on(
+  "reconnect",
+  ()=>{
+
+    connText.textContent =
+      "Menghubungkan ulang…";
+
+
+    dot.classList.remove(
+      "on"
+    );
+
+  }
+);
+
+
+
+/* =============================================================
+   17. MQTT OFFLINE
+============================================================= */
+
+
+client.on(
+  "offline",
+  ()=>{
+
+    connText.textContent =
+      "MQTT Offline";
+
+
+    dot.classList.remove(
+      "on"
+    );
+
+  }
+);
+
+
+
+/* =============================================================
+   18. MQTT ERROR
+============================================================= */
+
+
+client.on(
+  "error",
+  (error)=>{
+
+    console.error(
+      "MQTT Error:",
+      error
+    );
+
+  }
+);
+
+
+
+/* =============================================================
+   19. DATA DARI ESP32
+============================================================= */
+
+
+client.on(
+
+  "message",
+
+  (topic,message)=>{
+
+    try{
+
+
+      /*
+         MQTT message diubah
+         menjadi JSON.
+      */
+
+      const data =
+
+        JSON.parse(
+          message.toString()
+        );
+
+
+      /* --------------------------------
+         SUHU
+      -------------------------------- */
+
+      if(
+        typeof data.temperature ===
+        "number"
+      ){
+
+        state.temperature =
+          data.temperature;
+
+      }
+
+
+      /* --------------------------------
+         KELEMBAPAN
+      -------------------------------- */
+
+      if(
+        typeof data.humidity ===
+        "number"
+      ){
+
+        state.humidity =
+          data.humidity;
+
+      }
+
+
+      /* --------------------------------
+         STATUS RELAY 1
+      -------------------------------- */
+
+      if(
+        typeof data.relay1 !==
+        "undefined"
+      ){
+
+        state.relay1 =
+          parseRelayState(
+            data.relay1
+          );
+
+      }
+
+
+      /* --------------------------------
+         STATUS RELAY 2
+      -------------------------------- */
+
+      if(
+        typeof data.relay2 !==
+        "undefined"
+      ){
+
+        state.relay2 =
+          parseRelayState(
+            data.relay2
+          );
+
+      }
+
+
+      /*
+         Update tampilan
+      */
+
+      refresh();
+
+
+      /*
+         Masukkan data ke grafik
+      */
+
+      addHistory();
+
+
+    }
+
+
+    catch(error){
+
+      console.error(
+
+        "Payload bukan JSON valid:",
+
+        error
+
+      );
+
+    }
+
+  }
+
+);
+
+
+
+/* =============================================================
+   20. MEMBACA STATUS RELAY
+============================================================= */
+
+
+/*
+   Fungsi ini membuat web bisa menerima
+   beberapa bentuk status dari ESP32.
+
+   Contoh yang bisa diterima:
+
+   true
+   false
+
+   "ON"
+   "OFF"
+
+   "on"
+   "off"
+*/
+
+
+function parseRelayState(
+  value
+){
+
+  if(value === true){
+
+    return true;
+
+  }
+
+
+  if(value === false){
+
+    return false;
+
+  }
+
+
+  if(
+    String(value)
+      .toUpperCase() === "ON"
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+
+/* =============================================================
+   21. TAMPILAN TOPIC
+============================================================= */
+
+
+document.getElementById(
+  "mqttDisplay"
+).textContent =
+
+  CONFIG.SENSOR_TOPIC;
+
+
+document.getElementById(
+  "sensorTopicText"
+).textContent =
+
+  CONFIG.SENSOR_TOPIC;
+
+
+document.getElementById(
+  "commandTopicText"
+).textContent =
+
+  CONFIG.COMMAND_TOPIC;
+
+
+
+/* =============================================================
+   22. TAMPILAN AWAL
+============================================================= */
+
+
+refresh();
+
+
 </script>
+
 </body>
 </html>
